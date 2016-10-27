@@ -23,9 +23,11 @@ public class Carbanalyser{
    private String torsionalAnglesToSave=""; 
    public void readPDB(String filename){
       //read in the pdb file, add atoms, and also count the number of atoms
+      //variables to count number C,H,and O atoms
       int c=0;
       int h=0;
       int o = 0;
+      //read PDB
       try{
       
          double radius = 0;
@@ -34,8 +36,6 @@ public class Carbanalyser{
          while(file.hasNext()&&(!(file.next()).equals("END"))){
             
             StringTokenizer st = new StringTokenizer(file.nextLine());
-            
-            
             LinkedList<String> temp = new LinkedList<String>(); 
 
             while(st.hasMoreElements()){
@@ -43,9 +43,9 @@ public class Carbanalyser{
                 temp.add(st.nextToken());
               
             }
-            
-            
+             
             //setting unique IDs
+            // token format: 1 C1 AMAN 1 1.803 -0.843 0.163 1.00 0.00 CARB C
             if(temp.get(10).equals("C")){
                c++;
                atomsList.add(new Atom((String)temp.get(10),Integer.parseInt((String)temp.get(0)),radius,Double.parseDouble((String)temp.get(4)),Double.parseDouble((String)temp.get(5)),Double.parseDouble((String)temp.get(6)), c));
@@ -61,17 +61,6 @@ public class Carbanalyser{
                 atomsList.add(new Atom((String)temp.get(10),Integer.parseInt((String)temp.get(0)),radius,Double.parseDouble((String)temp.get(4)),Double.parseDouble((String)temp.get(5)),Double.parseDouble((String)temp.get(6)),o));
             }                        
             
-            
-            
-            // token format: 1 C1 AMAN 1 1.803 -0.843 0.163 1.00 0.00 CARB C
-
-            //add to list of atoms
-           
-            
-            
-            //number of atoms in the molecule equals to the number of atoms in the list
-
-
          }
       
       }catch(Exception e){}
@@ -91,19 +80,13 @@ public class Carbanalyser{
             Atom A = atomsList.get(i);
             Atom B = atomsList.get(j);
             bond = new Bond(A,B);
-            
-
-            // System.out.println(A.getSymbol() + " " + A.getRadius() + " " + B.getSymbol()+ " " + B.getRadius());             
+          
             if(bond.isBonded(A,B,distance(A,B))){
                numberOfBonds++;
                
                //add to list of bonds
                bondsList.add(bond);
-               
-               
-              
             }
-         
          }
       }
          mol.setNumOfBonds(numberOfBonds);
@@ -129,7 +112,7 @@ public class Carbanalyser{
                   numberOfAngles++;
                   
                   
-                  //calculating the angle 
+                  //create vectors that represent bonds 
                   vecA[0] = B.getX() - A.getX();
                   vecA[1] = B.getY() - A.getY();
                   vecA[2] = B.getZ() - A.getZ();
@@ -140,9 +123,7 @@ public class Carbanalyser{
                   double ang = 180 - ac.angle(vecA, vecB);
                   
                   displayAngles = displayAngles + A.getSymbol()+A.getID()+ "--" + B.getSymbol()+B.getID() + "--" +  C.getSymbol()+C.getID() +"<br>" +  ang +"<br><br>";
-                  anglesToSave = anglesToSave + A.getSymbol()+A.getID()+ "--" + B.getSymbol()+B.getID() + "--" +  C.getSymbol()+C.getID() +"\n" +  ang+"\n";
-                  
-                
+                  anglesToSave = anglesToSave + A.getSymbol()+A.getID()+ "--" + B.getSymbol()+B.getID() + "--" +  C.getSymbol()+C.getID() +"\n" +  ang+"\n"; 
                }               
             }
            
@@ -178,11 +159,8 @@ public class Carbanalyser{
                               
                   if((A.getNum()!= B.getNum())&&(A.getNum()!= C.getNum())&&(B.getNum()!= C.getNum())&&(A.getNum()!= D.getNum())&&(B.getNum()!= D.getNum())&&(C.getNum()!= D.getNum())&&(bond.isBonded(A,B,distance(A,B)))&&(bond.isBonded(B,C,distance(B,C)))&&(bond.isBonded(C,D,distance(C,D)))){
                      numOfDihedralAngles++;
-                     //System.out.println("sd");
-                     //add to list of bonds
-                     //bondsList.add(bond);
-                     
-                     //calulating dihedral angles
+
+                     //creating vectors to calculate the torsional angle
                      vec1[0] = D.getX() - C.getX();
                      vec1[1] = D.getY() - C.getY();
                      vec1[2] = D.getZ() - C.getZ();
@@ -197,14 +175,12 @@ public class Carbanalyser{
                      
                      vec4[0] = A.getX() - B.getX();
                      vec4[1] = A.getY() - B.getY();
-                     vec4[2] = A.getZ() - B.getZ();                     
-                     
+                     vec4[2] = A.getZ() - B.getZ();
                      
                      double dh = ac.calcDihedral(vec1,vec2,vec3,vec4);
                      
                      displayDihedralAngles = displayDihedralAngles + A.getSymbol()+A.getID()+ "--" + B.getSymbol()+B.getID() + "--" +  C.getSymbol()+C.getID() + "--" +  D.getSymbol()+D.getID() +"<br>" + dh+"<br><br>";
-                     torsionalAnglesToSave = torsionalAnglesToSave  + A.getSymbol()+A.getID()+ "--" + B.getSymbol()+B.getID() + "--" +  C.getSymbol()+C.getID() + "--" +  D.getSymbol()+D.getID() +"\n" + dh+"\n";                   
-                                           
+                     torsionalAnglesToSave = torsionalAnglesToSave  + A.getSymbol()+A.getID()+ "--" + B.getSymbol()+B.getID() + "--" +  C.getSymbol()+C.getID() + "--" +  D.getSymbol()+D.getID() +"\n" + dh+"\n";                                         
                   }                   
                }
               
@@ -215,6 +191,7 @@ public class Carbanalyser{
       mol.setNumOfDihedralAngles(numOfDihedralAngles);
    }
    
+   //distance between two atoms
    public double distance(Atom a, Atom b){
       double x1 = a.getX();
       double y1 = a.getY();
@@ -226,14 +203,7 @@ public class Carbanalyser{
             
       return Math.sqrt(Math.pow((x2-x1),2)+ Math.pow((y2-y1),2) + Math.pow((z2-z1),2));
    }
-   
-   public void setAngleDisplay(String data){
-      displayAngles=data;
-   }
-   
-   public void setDihedralAngleDisplay(String data){
-      displayDihedralAngles=data;
-   }
+  
     
    public String getAngleDisplay(){
       return displayAngles;
