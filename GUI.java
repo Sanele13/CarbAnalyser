@@ -22,12 +22,7 @@ public class GUI extends JFrame{
    private JMenuItem exportScreenData;
    private JMenuItem viewAngles;
    private JMenuItem viewDihedralAngles;
-   
-   
-   
-   
-   
-   
+
    JFileChooser chooser = new JFileChooser();
    
    String PDBFile;
@@ -67,52 +62,43 @@ public class GUI extends JFrame{
       
       help = new JMenu("Help");
       menuBar.add(help);
-      
-
-      
-            
+     
       Toolkit toolkit = getToolkit();
       Dimension size = toolkit.getScreenSize();
       setLocation(800,300);
       
       setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("Icon.jpg")));
-      
+      //labels to display on screen
       filename = new JLabel("Filename: ");
       filename.setBounds(0, 0, 300, 50);
       filename.setForeground(Color.WHITE);
       filename.setFont(new Font("Arial", Font.BOLD, 14));
       add(filename);
       
-      label = new JLabel("Number of atoms: ");
-      label.setBounds(0, 20, 300, 50);
-      label.setForeground(Color.WHITE);
-      label.setFont(new Font("Arial", Font.BOLD, 14));
-      add(label);
+      numOfAtomsLabel = new JLabel("Number of atoms: ");
+      numOfAtomsLabel.setBounds(0, 20, 300, 50);
+      numOfAtomsLabel.setForeground(Color.WHITE);
+      numOfAtomsLabel.setFont(new Font("Arial", Font.BOLD, 14));
+      add(numOfAtomsLabel);
 
       
-      JLabel label1 = new JLabel("Number of bonds: ");
-      label1.setBounds(0, 40, 300, 50);
-      label1.setForeground(Color.WHITE);
-      label1.setFont(new Font("Arial", Font.BOLD, 14));
-      add(label1);
-
-    ///  textfield = new JTextField(6);
-    //  add(textfield);
+      JLabel numOfBondsLabel = new JLabel("Number of bonds: ");
+      numOfBondsLabel.setBounds(0, 40, 300, 50);
+      numOfBondsLabel.setForeground(Color.WHITE);
+      numOfBondsLabel.setFont(new Font("Arial", Font.BOLD, 14));
+      add(numOfBondsLabel);
             
-      JLabel label2 = new JLabel("Number of angles: ");
-      label2.setBounds(0, 60, 300, 50);
-      label2.setForeground(Color.WHITE);
-      label2.setFont(new Font("Arial", Font.BOLD, 14));
-      add(label2);
-      
-    ///  textfield = new JTextField(6);
-     // add(textfield);
+      JLabel numOfAnglesLabel = new JLabel("Number of angles: ");
+      numOfAnglesLabel.setBounds(0, 60, 300, 50);
+      numOfAnglesLabel.setForeground(Color.WHITE);
+      numOfAnglesLabel.setFont(new Font("Arial", Font.BOLD, 14));
+      add(numOfAnglesLabel);
             
-      JLabel label3 = new JLabel("Number of dihedral angles: ");
-      label3.setBounds(0, 80, 300, 50);
-      label3.setForeground(Color.WHITE);
-      label3.setFont(new Font("Arial", Font.BOLD, 14));
-      add(label3);
+      JLabel numOfDihedralAnglesLabel = new JLabel("Number of dihedral angles: ");
+      numOfDihedralAnglesLabel.setBounds(0, 80, 300, 50);
+      numOfDihedralAnglesLabel.setForeground(Color.WHITE);
+      numOfDihedralAnglesLabel.setFont(new Font("Arial", Font.BOLD, 14));
+      add(numOfDihedralAnglesLabel);
       
       JLabel chemFormula = new JLabel();
       chemFormula.setBounds(130, 100, 300, 50);
@@ -126,16 +112,16 @@ public class GUI extends JFrame{
       chemFormulaField.setFont(new Font("Arial", Font.BOLD, 14));
       add(chemFormulaField);            
       
-
+      //'Choose PDB file' button
       button = new JButton("Choose PDB file");
       button.setBounds(0, 140, 150, 30);
       add(button);
-      
+      //'Analyse' button
       JButton runButton = new JButton("Analyse!");
       runButton.setBounds(0, 180, 150, 30);
       add(runButton);
 
-      //listeners
+      //listener for the 'Choose PDB file' button
       button.addActionListener(new  ActionListener () {
          public void actionPerformed(ActionEvent e){
             int state = chooser.showOpenDialog(null);
@@ -153,25 +139,24 @@ public class GUI extends JFrame{
          }
       });
       
+      //listener for the 'Analyse' button
       runButton.addActionListener(new  ActionListener () {
          public void actionPerformed(ActionEvent e){
             carb = new Carbanalyser();
             
             carb.readPDB(PDBFile);
-      
-            //System.out.println(carb.atomsList.get(0).getX());
-            carb.bondsCounter();
+            carb.bondsCounter(); 
             carb.anglesCounter();
             carb.dihedralAngleCounter();
+            //display data
+            numOfAtomsLabel.setText("Number of atoms: "+ carb.mol.getNumOfAtoms());
+            numOfBonsLabel.setText("Number of bonds: "+ carb.mol.getNumOfBonds());
+            numOfAnglesLabel.setText("Number of angles: "+ carb.mol.getNumOfAngles());
+            numOfDihedralAnglesLabel.setText("Number of dihedral angles: "+ carb.mol.getNumOfDihedralAngles());
             
-            label.setText("Number of atoms: "+ carb.mol.getNumOfAtoms());
-            
-            label1.setText("Number of bonds: "+ carb.mol.getNumOfBonds());
-            label2.setText("Number of angles: "+ carb.mol.getNumOfAngles());
-            label3.setText("Number of dihedral angles: "+ carb.mol.getNumOfDihedralAngles());
-            
+                  
             String formula = "<html>C<sub>"+carb.mol.getNumberOfCarbonAtoms()+"</sub>H<sub>"+carb.mol.getNumberOfHydrogenAtoms()+"</sub>O<sub>"+carb.mol.getNumberOfOxygenAtoms()+"</sub></html>"; 
-
+            //display chemical formula
             chemFormula.setText(formula);
             
          }
@@ -181,22 +166,17 @@ public class GUI extends JFrame{
          public void actionPerformed(ActionEvent e){
             //create a gui to display angles data
             JFrame anglesProperties = new JFrame();
-            
             anglesProperties.setTitle("Angle Properties"); 
-            
             Color color = Color.decode("0x121E31");
             anglesProperties.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             anglesProperties.setSize(600,600);
             anglesProperties.getContentPane().setBackground(color);
             
-            String html = "<html>"+carb.getAngleDisplay()+"</html>";
-            //System.out.println(s);
-           // p.add(new JLabel(html));
-            JScrollPane scrollpane = new JScrollPane();
+            String html = "<html>"+carb.getAngleDisplay()+"</html>"; //This is a good way of display text on a gui 
+            JScrollPane scrollpane = new JScrollPane();//To give users the ability to scroll up and down
             JLabel data = new JLabel(html);
             data.setForeground(Color.WHITE);
             scrollpane.setViewportView(data);
-            //scroll.getContentPane().add(scrollpane, BorderLayout.LINE_START); 
             scrollpane.getViewport().setBackground(color);
             anglesProperties.add(scrollpane);            
             anglesProperties.setVisible(true);        
@@ -207,22 +187,18 @@ public class GUI extends JFrame{
          public void actionPerformed(ActionEvent e){
             //create a gui to display torsional angles data
             JFrame DihedralAnglesProperties = new JFrame();
-            
             DihedralAnglesProperties.setTitle("Angle Properties"); 
-            
             Color color = Color.decode("0x121E31");
+            
             DihedralAnglesProperties.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             DihedralAnglesProperties.setSize(600,600);
             DihedralAnglesProperties.getContentPane().setBackground(color);
             
             String html = "<html>"+carb.getDihedralAngleDisplay()+"</html>";
-            //System.out.println(s);
-           // p.add(new JLabel(html));
             JScrollPane scrollpane = new JScrollPane();
             JLabel data = new JLabel(html);
             data.setForeground(Color.WHITE);
             scrollpane.setViewportView(data);
-            //scroll.getContentPane().add(scrollpane, BorderLayout.LINE_START); 
             scrollpane.getViewport().setBackground(color);
             DihedralAnglesProperties.add(scrollpane);            
             DihedralAnglesProperties.setVisible(true);    
@@ -231,17 +207,15 @@ public class GUI extends JFrame{
       
       exportAngles.addActionListener(new  ActionListener () {
          public void actionPerformed(ActionEvent e){
-            //Export to a file
+            //Export to a file (i.e. save the list angles)
             JFileChooser chooser = new JFileChooser();
             int state = chooser.showSaveDialog(null);
             File file = chooser.getSelectedFile();
-            //GUI gui = new GUI();
          
             if(state == JFileChooser.APPROVE_OPTION) {
-            //JOptionPane.showMessageDialog(null, file.getPath());
                filename.setText("Filename: "+file.getName());
                try{
-             
+                  //write to file
                   BufferedWriter output = new BufferedWriter(new FileWriter(file));
                   output.write(carb.getAnglesToSave());
                   output.close();
@@ -256,14 +230,12 @@ public class GUI extends JFrame{
       
       exportDihedralAngles.addActionListener(new  ActionListener () {
          public void actionPerformed(ActionEvent e){
-            //Export to a file
+            //Export to a file (i.e. save the list dihedral angles)
             JFileChooser chooser = new JFileChooser();
             int state = chooser.showSaveDialog(null);
             File file = chooser.getSelectedFile();
-            //GUI gui = new GUI();
          
             if(state == JFileChooser.APPROVE_OPTION) {
-            //JOptionPane.showMessageDialog(null, file.getPath());
                filename.setText("Filename: "+file.getName());
                try{
              
@@ -281,14 +253,12 @@ public class GUI extends JFrame{
 
       exportScreenData.addActionListener(new  ActionListener () {
          public void actionPerformed(ActionEvent e){
-            //Export to a file
+            //Export to a file (i.e. save the stuff on the screen)
             JFileChooser chooser = new JFileChooser();
             int state = chooser.showSaveDialog(null);
             File file = chooser.getSelectedFile();
-            //GUI gui = new GUI();
          
             if(state == JFileChooser.APPROVE_OPTION) {
-            //JOptionPane.showMessageDialog(null, file.getPath());
                filename.setText("Filename: "+file.getName());
                try{
              
@@ -306,8 +276,8 @@ public class GUI extends JFrame{
       
    }
    
-   //public class event implements
    public static void main(String [] args){
+      //Set GUI properties and display GUI
       GUI gui = new GUI();
       Color color = Color.decode("0x121E31");
       gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
